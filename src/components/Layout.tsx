@@ -1,7 +1,8 @@
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Menu, X, Car, User, Calendar, Info, Phone, Shield } from 'lucide-react';
+import { Menu, X, Car, User, Calendar, Info, Phone, Shield, ArrowUpRight } from 'lucide-react';
 import { useState } from 'react';
+import BrandLogo from './BrandLogo';
 
 export default function Layout() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -16,56 +17,61 @@ export default function Layout() {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col">
-      {/* Navbar */}
-      <header className="fixed top-0 left-0 right-0 z-50 glass-panel border-b border-white/20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-20">
-            {/* Logo */}
-            <Link to="/" className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-2xl brand-gradient flex items-center justify-center text-white shadow-lg shadow-brand-purple/30">
-                <Car size={24} />
-              </div>
-              <div className="flex flex-col">
-                <span className="font-bold text-xl tracking-tight text-brand-dark">RSCarWash</span>
-                <span className="text-xs font-medium text-brand-purple tracking-widest uppercase">Nettoyage Auto</span>
-              </div>
+    <div className="site-shell min-h-screen flex flex-col">
+      <header className="fixed left-1/2 top-4 z-50 w-[calc(100%-1rem)] max-w-6xl -translate-x-1/2 px-1">
+        <div className="floating-island rounded-[2rem] px-4 py-3 sm:px-5">
+          <div className="flex items-center justify-between gap-3">
+            <Link to="/" className="min-w-0">
+              <BrandLogo
+                size="md"
+                className="gap-2.5 text-white"
+                imageClassName="rounded-[1.2rem] border border-white/10 bg-white/90 p-1"
+                textClassName="min-w-0"
+              />
             </Link>
 
-            {/* Desktop Nav */}
-            <nav className="hidden md:flex items-center gap-8">
+            <nav className="hidden items-center gap-2 rounded-full bg-white/10 p-1.5 md:flex">
               {navLinks.map((link) => {
                 const isActive = location.pathname === link.path;
                 return (
                   <Link
                     key={link.path}
                     to={link.path}
-                    className={`text-sm font-medium transition-colors hover:text-brand-purple relative ${
-                      isActive ? 'text-brand-purple' : 'text-gray-600'
+                    className={`island-link relative px-4 py-2 text-sm font-semibold transition-all ${
+                      isActive ? 'bg-white text-brand-dark shadow-lg' : 'text-white/72 hover:text-white'
                     }`}
                   >
                     {link.name}
                     {isActive && (
                       <motion.div
                         layoutId="nav-indicator"
-                        className="absolute -bottom-2 left-0 right-0 h-0.5 brand-gradient rounded-full"
+                        className="absolute inset-0 rounded-full border border-white/60"
                       />
                     )}
                   </Link>
                 );
               })}
+            </nav>
+
+            <div className="hidden items-center gap-2 md:flex">
               <Link
                 to="/admin"
-                className="ml-4 p-2 rounded-full hover:bg-gray-100 transition-colors text-gray-400 hover:text-brand-dark"
+                className="rounded-full border border-white/10 bg-white/10 p-3 text-white/70 transition-colors hover:text-white"
                 title="Admin Panel"
               >
                 <Shield size={20} />
               </Link>
-            </nav>
+              <Link
+                to="/reservation"
+                className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-3 text-sm font-bold text-brand-dark transition-transform hover:scale-[1.02]"
+              >
+                Réserver
+                <ArrowUpRight size={16} />
+              </Link>
+            </div>
 
-            {/* Mobile Menu Button */}
             <button
-              className="md:hidden p-2 text-gray-600"
+              className="rounded-full border border-white/10 bg-white/10 p-3 text-white md:hidden"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             >
               {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -73,15 +79,14 @@ export default function Layout() {
           </div>
         </div>
 
-        {/* Mobile Nav */}
         {isMobileMenuOpen && (
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="md:hidden glass-panel border-t border-white/20"
+            className="mt-3 md:hidden"
           >
-            <div className="px-4 pt-2 pb-6 space-y-1">
+            <div className="floating-island space-y-2 rounded-[2rem] p-3">
               {navLinks.map((link) => {
                 const isActive = location.pathname === link.path;
                 return (
@@ -89,8 +94,8 @@ export default function Layout() {
                     key={link.path}
                     to={link.path}
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium transition-colors ${
-                      isActive ? 'bg-brand-purple/10 text-brand-purple' : 'text-gray-600 hover:bg-gray-50'
+                    className={`flex items-center gap-3 rounded-2xl px-4 py-3 text-base font-medium transition-colors ${
+                      isActive ? 'bg-white text-brand-dark' : 'text-white/80 hover:bg-white/10'
                     }`}
                   >
                     <link.icon size={20} />
@@ -101,61 +106,69 @@ export default function Layout() {
               <Link
                 to="/admin"
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium text-gray-500 hover:bg-gray-50"
+                className="flex items-center gap-3 rounded-2xl px-4 py-3 text-base font-medium text-white/70 hover:bg-white/10"
               >
                 <Shield size={20} />
                 Administration
+              </Link>
+              <Link
+                to="/reservation"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="mt-2 flex items-center justify-center gap-2 rounded-2xl bg-white px-4 py-3 text-base font-bold text-brand-dark"
+              >
+                Réserver
+                <ArrowUpRight size={18} />
               </Link>
             </div>
           </motion.div>
         )}
       </header>
 
-      {/* Main Content */}
-      <main className="flex-grow pt-20">
+      <main className="flex-grow pt-32">
         <Outlet />
       </main>
 
-      {/* Footer */}
-      <footer className="bg-brand-dark text-white py-12 border-t border-white/10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <footer className="relative overflow-hidden border-t border-white/30 bg-brand-dark py-12 text-white">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(135,206,235,0.18),_transparent_30%),radial-gradient(circle_at_bottom_left,_rgba(107,91,149,0.28),_transparent_35%)]" />
+        <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
             <div>
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 rounded-xl brand-gradient flex items-center justify-center text-white">
-                  <Car size={20} />
-                </div>
-                <span className="font-bold text-xl tracking-tight">RSCarWash</span>
+              <div className="mb-6">
+                <BrandLogo
+                  size="lg"
+                  className="text-white"
+                  imageClassName="rounded-[1.6rem] border border-white/10 bg-white/90 p-1"
+                />
               </div>
-              <p className="text-gray-400 text-sm">
-                L'excellence du nettoyage automobile. Perfection, douceur et brillance pour votre véhicule.
+              <p className="text-sm text-gray-400">
+                Nettoyage automobile intérieur premium, avec une présentation soignée, des finitions nettes et une vraie obsession du détail.
               </p>
             </div>
             <div>
-              <h3 className="font-semibold text-lg mb-4">Contact</h3>
+              <h3 className="mb-4 text-lg font-semibold">Contact</h3>
               <ul className="space-y-3 text-sm text-gray-400">
                 <li className="flex items-center gap-2">
                   <Phone size={16} className="text-brand-blue" />
                   07.82.37.81.15
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="text-brand-purple font-bold">Snap:</span> RScarwash34
+                  <span className="font-bold text-brand-purple">Snap:</span> RScarwash34
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="text-brand-purple font-bold">Insta:</span> RScarwash_34
+                  <span className="font-bold text-brand-purple">Insta:</span> RScarwash_34
                 </li>
               </ul>
             </div>
             <div>
-              <h3 className="font-semibold text-lg mb-4">Liens Rapides</h3>
+              <h3 className="mb-4 text-lg font-semibold">Liens Rapides</h3>
               <ul className="space-y-2 text-sm text-gray-400">
-                <li><Link to="/reservation" className="hover:text-brand-blue transition-colors">Réserver un lavage</Link></li>
-                <li><Link to="/client" className="hover:text-brand-blue transition-colors">Carte de fidélité</Link></li>
-                <li><Link to="/about" className="hover:text-brand-blue transition-colors">À propos de nous</Link></li>
+                <li><Link to="/reservation" className="transition-colors hover:text-brand-blue">Réserver un lavage</Link></li>
+                <li><Link to="/client" className="transition-colors hover:text-brand-blue">Carte de fidélité</Link></li>
+                <li><Link to="/about" className="transition-colors hover:text-brand-blue">À propos de nous</Link></li>
               </ul>
             </div>
           </div>
-          <div className="mt-12 pt-8 border-t border-white/10 text-center text-sm text-gray-500">
+          <div className="mt-12 border-t border-white/10 pt-8 text-center text-sm text-gray-500">
             &copy; {new Date().getFullYear()} RSCarWash34. Tous droits réservés.
           </div>
         </div>

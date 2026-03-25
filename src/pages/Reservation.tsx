@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { Calendar, Clock, Car, CheckCircle } from 'lucide-react';
 import { useState } from 'react';
+import BrandLogo from '../components/BrandLogo';
 
 export default function Reservation() {
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -17,14 +18,27 @@ export default function Reservation() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="text-center mb-12"
+        className="media-card mb-12 overflow-hidden rounded-[2.5rem] p-3"
       >
-        <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-4 text-brand-dark">
-          Réserver un <span className="brand-text-gradient">Lavage</span>
-        </h1>
-        <p className="text-lg text-gray-600">
-          Choisissez votre prestation et votre créneau idéal.
-        </p>
+        <div className="relative overflow-hidden rounded-[2rem] bg-white px-6 py-10 text-center sm:px-10">
+          <div
+            className="absolute inset-0 bg-cover bg-center opacity-[0.18]"
+            style={{
+              backgroundImage:
+                "url('https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1400&q=80')",
+            }}
+          />
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.92),rgba(255,255,255,0.88))]" />
+          <div className="relative">
+            <BrandLogo size="md" className="mx-auto mb-4 w-fit text-brand-dark" />
+            <h1 className="mb-4 text-4xl font-extrabold tracking-tight text-brand-dark md:text-5xl">
+              Réserver un <span className="brand-text-gradient">Lavage</span>
+            </h1>
+            <p className="text-lg text-gray-600">
+              Choisissez votre prestation et votre créneau idéal.
+            </p>
+          </div>
+        </div>
       </motion.div>
 
       {isSubmitted ? (

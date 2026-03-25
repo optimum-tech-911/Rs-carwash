@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
-import { User, Star, Award, LogOut } from 'lucide-react';
+import { Star, Award, LogOut } from 'lucide-react';
 import { useState } from 'react';
+import BrandLogo from '../components/BrandLogo';
 
 export default function ClientSpace() {
   // Mock data for demonstration
@@ -21,9 +22,7 @@ export default function ClientSpace() {
           className="w-full md:w-80 space-y-6"
         >
           <div className="glass-panel p-8 rounded-[2.5rem] text-center shadow-lg">
-            <div className="w-24 h-24 rounded-full brand-gradient mx-auto mb-4 flex items-center justify-center text-white shadow-lg">
-              <User size={40} />
-            </div>
+            <BrandLogo size="lg" showWordmark={false} className="mx-auto mb-4 w-fit" />
             <h2 className="text-2xl font-bold text-brand-dark mb-1">{user.name}</h2>
             <p className="text-gray-500 text-sm mb-6">{user.email}</p>
             <button className="w-full py-3 rounded-xl bg-gray-100 text-gray-700 font-medium hover:bg-gray-200 transition-colors flex items-center justify-center gap-2">
@@ -55,6 +54,10 @@ export default function ClientSpace() {
             {/* Background decoration */}
             <div className="absolute top-0 right-0 w-64 h-64 bg-brand-blue/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
             <div className="absolute bottom-0 left-0 w-64 h-64 bg-brand-purple/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
+            <div
+              className="absolute inset-0 bg-center bg-no-repeat bg-contain opacity-[0.08]"
+              style={{ backgroundImage: "url('/rscarwash-logo.png')" }}
+            />
 
             <div className="relative z-10">
               <div className="text-center mb-12">

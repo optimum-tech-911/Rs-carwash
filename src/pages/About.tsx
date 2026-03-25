@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { ShieldCheck, Star, Clock, MapPin } from 'lucide-react';
+import BrandLogo from '../components/BrandLogo';
 
 export default function About() {
   return (
@@ -26,14 +27,32 @@ export default function About() {
           transition={{ duration: 0.6 }}
           className="relative"
         >
-          <div className="aspect-square rounded-[3rem] overflow-hidden brand-gradient p-1">
-            <div className="w-full h-full bg-white rounded-[2.8rem] overflow-hidden">
-              <img 
-                src="https://images.unsplash.com/photo-1601362840469-51e4d8d58785?auto=format&fit=crop&q=80" 
-                alt="Car Wash Detail" 
-                className="w-full h-full object-cover opacity-90"
-                referrerPolicy="no-referrer"
-              />
+          <div className="media-card rounded-[3rem] p-4">
+            <div className="grid aspect-square grid-cols-[1.2fr_0.8fr] gap-4 overflow-hidden rounded-[2.5rem] bg-white p-4">
+              <div className="overflow-hidden rounded-[2rem]">
+                <img
+                  src="https://images.unsplash.com/photo-1601362840469-51e4d8d58785?auto=format&fit=crop&q=80&w=1200"
+                  alt="Car Wash Detail"
+                  className="h-full w-full object-cover opacity-90"
+                  referrerPolicy="no-referrer"
+                />
+              </div>
+              <div className="flex flex-col gap-4">
+                <div className="glass-panel flex-1 rounded-[2rem] p-4">
+                  <BrandLogo size="lg" className="mb-4 text-brand-dark" />
+                  <p className="text-sm leading-relaxed text-gray-600">
+                    Une image de marque forte, un service propre et une attention visible dans chaque finition.
+                  </p>
+                </div>
+                <div className="overflow-hidden rounded-[2rem]">
+                  <img
+                    src="https://images.unsplash.com/photo-1489824904134-891ab64532f1?auto=format&fit=crop&q=80&w=900"
+                    alt="Automotive Interior"
+                    className="h-full w-full object-cover"
+                    referrerPolicy="no-referrer"
+                  />
+                </div>
+              </div>
             </div>
           </div>
           <div className="absolute -bottom-6 -right-6 glass-panel p-6 rounded-3xl shadow-xl">
@@ -58,9 +77,8 @@ export default function About() {
         >
           <h2 className="text-3xl font-bold">Notre Passion, Votre Brillance</h2>
           <p className="text-gray-600 leading-relaxed text-lg">
-            Chez RSCarWash, nous ne faisons pas que laver des voitures, nous leur redonnons vie. 
-            Notre équipe de passionnés utilise les meilleurs produits et techniques pour garantir 
-            un résultat impeccable, à l'intérieur comme à l'extérieur.
+            Chez RSCarWash, nous ne faisons pas que laver des voitures, nous leur redonnons vie.
+            Notre approche mélange présentation visuelle, nettoyage minutieux et finition élégante pour que chaque véhicule reparte avec une vraie signature.
           </p>
           
           <div className="space-y-6">

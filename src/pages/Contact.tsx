@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { Phone, Mail, MapPin, Send } from 'lucide-react';
+import BrandLogo from '../components/BrandLogo';
 
 export default function Contact() {
   return (
@@ -8,14 +9,27 @@ export default function Contact() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="text-center mb-16"
+        className="media-card mb-16 overflow-hidden rounded-[2.5rem] p-3"
       >
-        <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-4 text-brand-dark">
-          Contactez <span className="brand-text-gradient">Nous</span>
-        </h1>
-        <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-          Une question ? Besoin d'un devis spécifique ? N'hésitez pas à nous contacter.
-        </p>
+        <div className="relative overflow-hidden rounded-[2rem] bg-white px-6 py-10 text-center sm:px-10">
+          <div
+            className="absolute inset-0 bg-cover bg-center opacity-[0.18]"
+            style={{
+              backgroundImage:
+                "url('https://images.unsplash.com/photo-1486006920555-c77dcf18193c?auto=format&fit=crop&w=1400&q=80')",
+            }}
+          />
+          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.92),rgba(255,255,255,0.88))]" />
+          <div className="relative">
+            <BrandLogo size="md" className="mx-auto mb-4 w-fit text-brand-dark" />
+            <h1 className="mb-4 text-4xl font-extrabold tracking-tight text-brand-dark md:text-5xl">
+              Contactez <span className="brand-text-gradient">Nous</span>
+            </h1>
+            <p className="mx-auto max-w-2xl text-lg text-gray-600">
+              Une question ? Besoin d&apos;un devis spécifique ? N&apos;hésitez pas à nous contacter.
+            </p>
+          </div>
+        </div>
       </motion.div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
