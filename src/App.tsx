@@ -6,10 +6,12 @@ import Reservation from './pages/Reservation';
 import Contact from './pages/Contact';
 import ClientSpace from './pages/ClientSpace';
 import Admin from './pages/Admin';
+import ScrollToTop from './components/ScrollToTop';
 
 export default function App() {
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <Routes>
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />

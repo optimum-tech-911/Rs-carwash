@@ -1,104 +1,116 @@
-import { useRef } from 'react';
-import { useFrame } from '@react-three/fiber';
-import { Environment, Float, ContactShadows, RoundedBox, Cylinder, Box } from '@react-three/drei';
+import { useMemo, useRef } from 'react';
+import { useFrame, useLoader } from '@react-three/fiber';
+import { ContactShadows, Environment } from '@react-three/drei';
+import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js';
 import * as THREE from 'three';
 
-export default function CarModel({ scrollProgress = 0 }: { scrollProgress?: number }) {
+import modelUrl from '../2020-audi-rs6-avant/source-files/FINAL_MODEL_1.fbx?url';
+
+const textureModules = import.meta.glob('../2020-audi-rs6-avant/source-files/*.{png,jpg,jpeg}', {
+  eager: true,
+  import: 'default',
+  query: '?url',
+}) as Record<string, string>;
+
+export default function CarModel({
+  scrollProgress = 0,
+  scaleMultiplier = 1,
+  spinOnScroll = false,
+  autoSpin = false,
+}: {
+  scrollProgress?: number;
+  scaleMultiplier?: number;
+  spinOnScroll?: boolean;
+  autoSpin?: boolean;
+}) {
+  const textureMap = useMemo(() => {
+    return Object.fromEntries(
+      Object.entries(textureModules).map(([path, url]) => [path.split('/').pop() ?? path, url]),
+    );
+  }, []);
+
+  const source = useLoader(FBXLoader, modelUrl, (loader) => {
+    loader.manager.setURLModifier((url) => {
+      const key = url.split('/').pop() ?? url;
+      return textureMap[key] ?? url;
+    });
+  });
+
+  const car = useMemo(() => {
+    const cloned = source.clone();
+    const bounds = new THREE.Box3().setFromObject(cloned);
+    const size = bounds.getSize(new THREE.Vector3());
+    const center = bounds.getCenter(new THREE.Vector3());
+    const maxDimension = Math.max(size.x, size.y, size.z) || 1;
+    const fitScale = 3.6 / maxDimension;
+
+    cloned.position.sub(center);
+    cloned.scale.setScalar(fitScale);
+
+    cloned.traverse((child) => {
+      if (!(child instanceof THREE.Mesh)) return;
+
+      child.castShadow = true;
+      child.receiveShadow = true;
+
+      const applyMaterialTweaks = (material: THREE.Material) => {
+        const standardMaterial = material as THREE.MeshStandardMaterial;
+        standardMaterial.envMapIntensity = 1.35;
+        standardMaterial.needsUpdate = true;
+
+        if ('metalness' in standardMaterial && typeof standardMaterial.metalness === 'number') {
+          standardMaterial.metalness = Math.min(1, Math.max(0.15, standardMaterial.metalness));
+        }
+
+        if ('roughness' in standardMaterial && typeof standardMaterial.roughness === 'number') {
+          standardMaterial.roughness = Math.min(0.72, Math.max(0.12, standardMaterial.roughness));
+        }
+      };
+
+      if (Array.isArray(child.material)) {
+        child.material.forEach(applyMaterialTweaks);
+      } else if (child.material) {
+        applyMaterialTweaks(child.material);
+      }
+    });
+
+    return cloned;
+  }, [source]);
+
   const group = useRef<THREE.Group>(null);
+  const haloRef = useRef<THREE.Mesh>(null);
 
   useFrame((state) => {
-    if (!group.current) return;
-    
-    // Smoothly interpolate rotation based on scroll progress
-    // scrollProgress goes from 0 to 1 (only during hero section)
-    // Rotate 180 degrees to show the profile and back as you scroll down
-    const targetRotationY = scrollProgress * Math.PI; 
-    const targetRotationX = Math.sin(scrollProgress * Math.PI) * 0.1;
-    const targetScale = 1 + Math.sin(scrollProgress * Math.PI) * 0.3; // Scale up as you scroll
+    if (!group.current || !haloRef.current) return;
 
-    group.current.rotation.y = THREE.MathUtils.lerp(group.current.rotation.y, targetRotationY, 0.05);
-    group.current.rotation.x = THREE.MathUtils.lerp(group.current.rotation.x, targetRotationX, 0.05);
-    group.current.scale.setScalar(THREE.MathUtils.lerp(group.current.scale.x, targetScale, 0.05));
-    
-    // Add a gentle floating effect independent of scroll
-    group.current.position.y = Math.sin(state.clock.elapsedTime * 2) * 0.05;
-  });
+    const pulse = Math.sin(state.clock.elapsedTime * 1.4) * 0.03;
+    const targetY = autoSpin || spinOnScroll ? pulse : pulse - scrollProgress * 0.14;
+    const targetScale = scaleMultiplier;
+    const targetXRotation = autoSpin || spinOnScroll ? 0.04 : 0.04 - scrollProgress * 0.035;
+    const targetYRotation = autoSpin || spinOnScroll
+      ? state.clock.elapsedTime * 0.45
+      : Math.sin(scrollProgress * Math.PI) * 0.07;
 
-  // Brand colors: Purple #6B5B95, Blue #87CEEB
-  const bodyMaterial = new THREE.MeshPhysicalMaterial({ 
-    color: '#6B5B95', 
-    metalness: 0.7, 
-    roughness: 0.2,
-    clearcoat: 1,
-    clearcoatRoughness: 0.1
-  });
-  
-  const glassMaterial = new THREE.MeshPhysicalMaterial({
-    color: '#1A1A2E',
-    metalness: 0.5,
-    roughness: 0.1,
-    transmission: 0.8,
-    thickness: 0.5,
-    transparent: true,
-    opacity: 0.9
-  });
+    group.current.position.y = THREE.MathUtils.lerp(group.current.position.y, targetY, 0.06);
+    group.current.rotation.x = THREE.MathUtils.lerp(group.current.rotation.x, targetXRotation, 0.05);
+    group.current.rotation.y = THREE.MathUtils.lerp(group.current.rotation.y, targetYRotation, 0.045);
+    group.current.scale.setScalar(THREE.MathUtils.lerp(group.current.scale.x, targetScale, 0.06));
 
-  const grillMaterial = new THREE.MeshStandardMaterial({
-    color: '#000000',
-    roughness: 0.9,
-    metalness: 0.1
-  });
-
-  const wheelMaterial = new THREE.MeshStandardMaterial({
-    color: '#111111',
-    roughness: 0.8,
-    metalness: 0.2
-  });
-
-  const headlightMaterial = new THREE.MeshStandardMaterial({
-    color: '#ffffff',
-    emissive: '#ffffff',
-    emissiveIntensity: 2,
-    toneMapped: false
-  });
-
-  const taillightMaterial = new THREE.MeshStandardMaterial({
-    color: '#ff0000',
-    emissive: '#ff0000',
-    emissiveIntensity: 2,
-    toneMapped: false
+    haloRef.current.rotation.z += 0.0026;
+    haloRef.current.scale.setScalar(1 + scrollProgress * 0.12);
   });
 
   return (
     <>
       <Environment preset="city" />
-      <Float speed={2} rotationIntensity={0.1} floatIntensity={0.2}>
-        <group ref={group} position={[0, -0.5, 0]}>
-          {/* RS3 Sportback Lower Body */}
-          <RoundedBox args={[2.1, 0.55, 4.2]} radius={0.15} smoothness={4} position={[0, 0.5, 0]} material={bodyMaterial} />
-          
-          {/* RS3 Hatchback Cabin */}
-          <RoundedBox args={[1.5, 0.45, 2.2]} radius={0.2} smoothness={4} position={[0, 1.0, -0.4]} material={glassMaterial} />
-          
-          {/* Aggressive Front Grill (Audi style) */}
-          <Box args={[1.2, 0.45, 0.1]} position={[0, 0.45, 2.1]} material={grillMaterial} />
-          
-          {/* Headlights */}
-          <Box args={[0.4, 0.1, 0.1]} position={[0.7, 0.6, 2.08]} material={headlightMaterial} />
-          <Box args={[0.4, 0.1, 0.1]} position={[-0.7, 0.6, 2.08]} material={headlightMaterial} />
-
-          {/* Taillights */}
-          <Box args={[0.5, 0.1, 0.1]} position={[0.6, 0.6, -2.08]} material={taillightMaterial} />
-          <Box args={[0.5, 0.1, 0.1]} position={[-0.6, 0.6, -2.08]} material={taillightMaterial} />
-          
-          {/* Sporty Wheels */}
-          <Cylinder args={[0.4, 0.4, 0.25, 32]} rotation={[0, 0, Math.PI / 2]} position={[1.05, 0.4, 1.3]} material={wheelMaterial} />
-          <Cylinder args={[0.4, 0.4, 0.25, 32]} rotation={[0, 0, Math.PI / 2]} position={[-1.05, 0.4, 1.3]} material={wheelMaterial} />
-          <Cylinder args={[0.4, 0.4, 0.25, 32]} rotation={[0, 0, Math.PI / 2]} position={[1.05, 0.4, -1.2]} material={wheelMaterial} />
-          <Cylinder args={[0.4, 0.4, 0.25, 32]} rotation={[0, 0, Math.PI / 2]} position={[-1.05, 0.4, -1.2]} material={wheelMaterial} />
-        </group>
-      </Float>
-      <ContactShadows position={[0, -1.0, 0]} opacity={0.5} scale={12} blur={2.5} far={4} />
+      <group ref={group} position={[0, 0, 0]} rotation={[0.04, 0, 0]} scale={scaleMultiplier}>
+        <mesh ref={haloRef} position={[0, -1.25, -0.65]} rotation={[-Math.PI / 2, 0, 0]}>
+          <ringGeometry args={[1.85, 2.05, 72]} />
+          <meshBasicMaterial color="#87CEEB" transparent opacity={0.24} side={THREE.DoubleSide} />
+        </mesh>
+        <primitive object={car} position={[0, 0, 0]} rotation={[0, 0, 0]} />
+      </group>
+      <ContactShadows position={[0, -1.7, 0]} opacity={0.52} scale={8} blur={2.8} far={4.8} />
     </>
   );
 }
